@@ -12,6 +12,7 @@ public class Layout<V, E> implements java.io.Serializable {
     //node -> (Center, TopLeft)
     private Map<V, Pair<Point2D, Point2D>> nodePositions = new HashMap<V, Pair<Point2D, Point2D>>();
     private Map<E, EdgeLayout> edgePositions = new HashMap<E, EdgeLayout>();
+    private Map<V, Point2D> nodeSizes = new HashMap<V, Point2D>();
     public Layout(LGraph lgraph, Map<V, Node> nodes, Map<E, Edge> edges, Configuration configuration) {
         config = configuration;
 
@@ -22,6 +23,7 @@ public class Layout<V, E> implements java.io.Serializable {
             Point2D topleft = new Point2D.Double(n.getLNode().getLeftPixelOffset(), center.getY() - n.getHeight()*0.5);
 
             nodePositions.put(entry.getKey(), new Pair<Point2D, Point2D>(center, topleft));
+            nodeSizes.put(entry.getKey(), new Point2D.Double(n.getWidth(), n.getHeight()));
 
             double minx = topleft.getX();
             double maxx = center.getX() + n.getWidth()*0.5;
@@ -61,11 +63,31 @@ public class Layout<V, E> implements java.io.Serializable {
         return Util.translatePoint(nodePositions.get(node).second, new Point2D.Double(shiftX, shiftY));
     }
 
+    public EdgeLayout getEdgeLayout(E edge) {
+        return edgePositions.get(edge);
+    }
+
     public double getWidth() {
         return width;
     }
 
     public double getHeight() {
         return height;
+    }
+
+    public Set<V> getNodeSet() {
+        return nodePositions.keySet();
+    }
+
+    public Set<E> getEdgeSet() {
+        return edgePositions.keySet();
+    }
+
+    public double getNodeWidth(V node) {
+        return nodeSizes.get(node).getX();
+    }
+
+    public double getNodeHeight(V node) {
+        return nodeSizes.get(node).getY();
     }
 }

@@ -29,13 +29,22 @@ public class DiGraph<V, E> {
         LGraph lg = generateLGraph(config);
         lg.topDownParentMedianReordering();
         lg.bottomUpMedianReordering();
+        //lg.topDownMedianReordering();
+        lg.topDownAMReordering();
+        //lg.topDownAMReordering();
+        lg.setInitialPixelOffsets();
         return new Layout<V, E>(lg, vToNode, eToEdge, config);
     }
 
     private void removeCycles() {
         // Reverse as few edges as possible to get an acyclic graph
         // Due to the complexity of the problem (I think it's NP-complete), use a greedy (non-optimal) approach
-        Collection<Node> remainingNodes = vToNode.values();
+        // Collection<Node> remainingNodes = vToNode.values();
+        Set<Node> remainingNodes = new HashSet<Node>();
+        for (Node n : vToNode.values()) {
+            remainingNodes.add(n);
+        }
+
         while (!remainingNodes.isEmpty()) {
             int size;
             // remove remaining sources and sinks
@@ -111,7 +120,12 @@ public class DiGraph<V, E> {
             setLayersTopDownDFS(source);
         }
 
-        Collection<Node> toBeChecked = vToNode.values();
+        // Collection<Node> toBeChecked = vToNode.values();
+        Set<Node> toBeChecked = new HashSet<Node>();
+        for (Node n : vToNode.values()) {
+            toBeChecked.add(n);
+        }
+
         while (!toBeChecked.isEmpty()) {
             Set<Node> toBeCheckedNextTime = new HashSet<Node>();
             for (Node n : toBeChecked) {

@@ -34,6 +34,18 @@ class LGraph {
         }
     }
 
+    void topDownMedianReordering() {
+        for (int y = 0; y < numberOfLayers; y++) {
+            layers.get(y).medianReordering();
+        }
+    }
+
+    void topDownAMReordering() {
+        for (int y = 0; y < numberOfLayers; y++) {
+            layers.get(y).arithmeticMeanReordering();
+        }
+    }
+
     void setInitialPixelOffsets() {
         for (Layer layer : layers) {
             layer.setInitialPixelOffsets();

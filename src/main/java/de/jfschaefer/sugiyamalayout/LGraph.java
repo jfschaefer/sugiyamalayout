@@ -3,6 +3,12 @@ package de.jfschaefer.sugiyamalayout;
 import java.util.*;
 
 
+/*
+    An LGraph is a Graph representation that focuses on the different layers of the layered graph representation.
+    Each layer is a list of LNodes, which can be dummy nodes for longer edges.
+    The main goal is to permute the nodes in the different layers in a way that minimizes edge crossings.
+    Also, this representation supports to get concrete pixel positions of the nodes.
+ */
 class LGraph {
     private Configuration config;
     private int numberOfLayers = 0;

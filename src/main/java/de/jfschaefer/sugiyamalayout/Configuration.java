@@ -8,6 +8,7 @@ public class Configuration implements java.io.Serializable {
     private double graphPadding = 25;
     private boolean centralizeEdges = false;
     private boolean useBeziercurves = true;
+    private boolean useAlternativeAlgorithm = true;    // otherwise algorithm closer to original Sugiyama will be used
 
 
     public double getDummyNodeWidth() {
@@ -66,5 +67,13 @@ public class Configuration implements java.io.Serializable {
 
     public void setUseBezierCurves(boolean useBeziercurves) {
         this.useBeziercurves = useBeziercurves;
+    }
+
+    public void setUseAlternativeAlgorithm(boolean useAlternativeAlgorithm) {
+        this.useAlternativeAlgorithm = useAlternativeAlgorithm;
+    }
+
+    public boolean getUseAlternativeAlgorithm() {
+        return useAlternativeAlgorithm;
     }
 }

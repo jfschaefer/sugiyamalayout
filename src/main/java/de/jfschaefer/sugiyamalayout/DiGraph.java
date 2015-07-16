@@ -26,13 +26,21 @@ public class DiGraph<V, E> {
         reset();
         removeCycles();
         setLayers();
-        LGraph lg = generateLGraph(config);
-        lg.topDownParentMedianReordering();
-        lg.bottomUpMedianReordering();
-        //lg.topDownMedianReordering();
-        lg.topDownAMReordering();
-        //lg.topDownAMReordering();
-        while (lg.topDownGreedySwapping());
+
+        LGraph lg;
+        if (config.getUseAlternativeAlgorithm()) {
+            PGraph pg = new PGraph(config);
+            for (Node n : vToNode.values()) {
+                pg.addNode(n);
+            }
+            for (Edge e : eToEdge.values()) {
+                pg.addEdge(e);
+            }
+            lg = pg.getLGraph();
+        } else {
+            lg = runSugiyama(config);
+        }
+
         lg.setInitialPixelOffsets();
         for (int i = 0; i < 5; i++) {
             lg.topDownOffsetRelaxation();
@@ -40,6 +48,15 @@ public class DiGraph<V, E> {
         }
         lg.topDownOffsetRelaxation();
         return new Layout<V, E>(lg, vToNode, eToEdge, config);
+    }
+
+    private LGraph runSugiyama(Configuration config) {
+        LGraph lg = generateLGraph(config);
+        lg.topDownParentMedianReordering();
+        lg.bottomUpMedianReordering();
+        lg.topDownAMReordering();
+        while (lg.topDownGreedySwapping());
+        return lg;
     }
 
     private void removeCycles() {

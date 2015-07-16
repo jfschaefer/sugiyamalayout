@@ -16,7 +16,12 @@ class LGraph {
         node.setConfiguration(config);
         int layer = node.getLayer();
         while (layer >= numberOfLayers) {
-            layers.add(new Layer(config));
+            Layer nl = new Layer(config);
+            if (numberOfLayers > 0) {
+                nl.setParentLayer(layers.get(layers.size() - 1));
+                layers.get(layers.size() - 1).setChildrenLayer(nl);
+            }
+            layers.add(nl);
             numberOfLayers++;
         }
         layers.get(layer).addNode(node);
@@ -49,6 +54,26 @@ class LGraph {
     void setInitialPixelOffsets() {
         for (Layer layer : layers) {
             layer.setInitialPixelOffsets();
+        }
+    }
+
+    void topDownOffsetRelaxation() {
+        for (Layer layer : layers) {
+            layer.relaxPixelOffsets();
+        }
+    }
+
+    boolean topDownGreedySwapping() {
+        boolean somethingChanged = false;
+        for (Layer layer : layers) {
+            somethingChanged |= layer.greedyOptimization();
+        }
+        return somethingChanged;
+    }
+
+    void bottomUpOffsetRelaxation() {
+        for (int i = 0; i < layers.size(); i++) {
+            layers.get(layers.size() - 1 - i).relaxPixelOffsets();
         }
     }
 }

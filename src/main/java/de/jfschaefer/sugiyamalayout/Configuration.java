@@ -1,11 +1,13 @@
 package de.jfschaefer.sugiyamalayout;
 
 public class Configuration implements java.io.Serializable {
-    private double dummyNodeWidth = 24;
-    private double initialNodeMargin = 52;
-    private double layerDistance = 124;
-    private double graphPadding = 24;
-    private boolean edgeCentralization = false;
+    private double dummyNodeWidth = 25;
+    private double initialNodeMargin = 121;
+    private double minimalNodeMargin = 36;
+    private double layerDistance = 121;
+    private double graphPadding = 25;
+    private boolean centralizeEdges = false;
+    private boolean useBeziercurves = true;
 
 
     public double getDummyNodeWidth() {
@@ -42,11 +44,27 @@ public class Configuration implements java.io.Serializable {
         graphPadding = padding;
     }
 
-    public boolean isEdgeCentralization() {
-        return edgeCentralization;
+    public double getMinimalNodeMargin() {
+        return minimalNodeMargin;
     }
 
-    public void setEdgeCentralization(boolean edgeCentralization) {
-        this.edgeCentralization = edgeCentralization;
+    public void setMinimalNodeMargin(double margin) {
+        minimalNodeMargin = margin;
+    }
+
+    public boolean getCentralizeEdges() {
+        return centralizeEdges;
+    }
+
+    public void setCentralizeEdges (boolean edgeCentralization) {
+        this.centralizeEdges = edgeCentralization;
+    }
+
+    public boolean getUseBezierCurves() {
+        return useBeziercurves;
+    }
+
+    public void setUseBezierCurves(boolean useBeziercurves) {
+        this.useBeziercurves = useBeziercurves;
     }
 }

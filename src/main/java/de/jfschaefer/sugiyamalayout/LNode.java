@@ -92,7 +92,7 @@ class LNode {
     }
 
     double getOutEdgeXPos(LNode towards) {
-        if (config.isEdgeCentralization()) {
+        if (config.getCentralizeEdges()) {
             return getPixelOffset();
         } else {
             assert children.contains(towards);
@@ -108,7 +108,7 @@ class LNode {
     }
 
     double getInEdgeXPos(LNode from) {
-        if (config.isEdgeCentralization()) {
+        if (config.getCentralizeEdges()) {
             return getPixelOffset();
         } else {
             assert parents.contains(from);

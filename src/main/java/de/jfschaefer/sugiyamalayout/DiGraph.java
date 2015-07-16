@@ -32,7 +32,13 @@ public class DiGraph<V, E> {
         //lg.topDownMedianReordering();
         lg.topDownAMReordering();
         //lg.topDownAMReordering();
+        while (lg.topDownGreedySwapping());
         lg.setInitialPixelOffsets();
+        for (int i = 0; i < 5; i++) {
+            lg.topDownOffsetRelaxation();
+            lg.bottomUpOffsetRelaxation();
+        }
+        lg.topDownOffsetRelaxation();
         return new Layout<V, E>(lg, vToNode, eToEdge, config);
     }
 

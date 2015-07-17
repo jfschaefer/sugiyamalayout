@@ -25,6 +25,10 @@ class Layer {
         this.childrenLayer = childrenLayer;
     }
 
+    ArrayList<LNode> getNodes() {
+        return nodes;
+    }
+
     void parentMedianReordering() {
         final Map<LNode, Integer> medianMap = new HashMap<LNode, Integer>();
         for (LNode lnode : nodes) {

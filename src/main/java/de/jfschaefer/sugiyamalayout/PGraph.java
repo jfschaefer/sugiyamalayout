@@ -34,6 +34,15 @@ public class PGraph {
             root.addChild(new PChild(source, true, null));
             source.addParent(root);
         }
+
+        while (root.tryToResolve());
+
+        for (PNode node : nodeMap.values()) {
+            if (node.isResolved() && !node.isRoot()) {
+                node.getOriginalNode().setMarker(true);
+            }
+        }
+
         setLayers();
         LGraph lg = new LGraph(config);
         fillLGraphDFS(lg, root);
@@ -105,8 +114,10 @@ public class PGraph {
                     lg.insertNode(ln);
                 }
             }
-            lg.insertNode(child.getNode().getOriginalNode().getLNode());
-            fillLGraphDFS(lg, child.getNode());
+            if (!lg.isInsertedAlready(child.getNode().getOriginalNode().getLNode())) {
+                lg.insertNode(child.getNode().getOriginalNode().getLNode());
+                fillLGraphDFS(lg, child.getNode());
+            }
         }
     }
 }

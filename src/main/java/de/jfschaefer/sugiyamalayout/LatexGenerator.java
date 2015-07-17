@@ -18,7 +18,11 @@ public class LatexGenerator<V, E> {
             result.append(layout.getNodeWidth(node));
             result.append("pt, minimum height=");
             result.append(layout.getNodeHeight(node));
-            result.append("pt] {");
+            if (layout.nodeHasMarker(node)) {
+                result.append("pt, fill=red] {");
+            } else {
+                result.append("pt] {");
+            }
             result.append(nodeNames.get(node));
             result.append("};\n");
         }

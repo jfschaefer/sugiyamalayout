@@ -9,6 +9,10 @@ class Node {
     private HashSet<Edge> ingoingEdges = new HashSet<Edge>();
     private HashSet<Edge> outgoingEdges = new HashSet<Edge>();
     private int layer = -1;
+    private boolean marker = false;   // The mark is only supposed to be used in the visualization.
+                                      // It can be set for debugging purposes
+                                      // Probably, it makes sense in the future to have a more sophisticated system
+                                      // which allows the user of the library to set markers
 
     Node(double width, double height) {
         this.width = width;
@@ -112,5 +116,13 @@ class Node {
     void reset() {
         layer = -1;
         lnode = null;
+    }
+
+    boolean hasMarker() {
+        return marker;
+    }
+
+    void setMarker(boolean marker) {
+        this.marker = marker;
     }
 }

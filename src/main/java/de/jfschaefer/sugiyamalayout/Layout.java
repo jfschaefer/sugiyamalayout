@@ -13,8 +13,13 @@ public class Layout<V, E> implements java.io.Serializable {
     private Map<V, Pair<Point2D, Point2D>> nodePositions = new HashMap<V, Pair<Point2D, Point2D>>();
     private Map<E, EdgeLayout> edgePositions = new HashMap<E, EdgeLayout>();
     private Map<V, Point2D> nodeSizes = new HashMap<V, Point2D>();
+    private LGraph lgraph;
+    private Map<V, Node> nodeMap;
+
     public Layout(LGraph lgraph, Map<V, Node> nodes, Map<E, Edge> edges, Configuration configuration) {
         config = configuration;
+        this.lgraph = lgraph;
+        nodeMap = nodes;
 
         boolean initializedBoundaryValues = false;
         for (Map.Entry<V, Node> entry : nodes.entrySet()) {
@@ -89,5 +94,13 @@ public class Layout<V, E> implements java.io.Serializable {
 
     public double getNodeHeight(V node) {
         return nodeSizes.get(node).getY();
+    }
+
+    public Node getNodeNode(V node) {
+        return nodeMap.get(node);
+    }
+
+    public boolean nodeHasMarker(V node) {
+        return getNodeNode(node).hasMarker();
     }
 }

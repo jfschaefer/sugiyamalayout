@@ -33,6 +33,11 @@ class LGraph {
         layers.get(layer).addNode(node);
     }
 
+    boolean isInsertedAlready(LNode node) {
+        if (node.getLayer() >= numberOfLayers) return false;
+        return layers.get(node.getLayer()).getNodes().contains(node);
+    }
+
     void topDownParentMedianReordering() {
         for (int y = 1; y < numberOfLayers; y++) {
             layers.get(y).parentMedianReordering();

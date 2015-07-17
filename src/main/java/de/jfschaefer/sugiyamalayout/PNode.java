@@ -67,6 +67,7 @@ class PNode {
         boolean achievedSomething = false;
         for (int i = 0; i < children.size(); i++) {
             PChild child = children.get(i);
+            if (child.getNode() == this) continue;
             achievedSomething |= child.getNode().tryToResolve();
         }
         if (achievedSomething) {
@@ -76,6 +77,7 @@ class PNode {
                 achievedSomething = false;
                 for (int i = 0; i < children.size(); i++) {
                     PChild child = children.get(i);
+                    if (child.getNode() == this || child.isFake()) continue;
                     achievedSomething |= child.getNode().tryToResolve();
                 }
             }
@@ -84,7 +86,7 @@ class PNode {
 
         Set<PNode> unresolvedChildren = new HashSet<PNode>();
         for (PChild child : children) {
-            if (!child.getNode().isResolved()) {
+            if (!child.isFake() && !child.getNode().isResolved()) {
                 unresolvedChildren.add(child.getNode());
             }
         }
@@ -177,6 +179,7 @@ class PNode {
                                         (pathnode, new Pair<PNode, PNode>(pathChild, neighbor), getDirectDescendants(neighbor)));
                             } else {
                                 System.err.println("FIX LEAVES 00");
+                                pathnode.fixChildOrder(neighbor, pathChild);
                                 fixLeavesOn(neighbor, this, cycleNodes);
                             }
                         }
@@ -211,14 +214,11 @@ class PNode {
                                 if (triple.third.contains(pathnode)) {
                                     if (triple.first.getChildIndex(triple.second.first) > triple.first.getChildIndex(triple.second.second)) {
                                         // we have to swap the children
-                                        System.err.println("MOVE IN 01");
                                         achievedSomething = true;
                                         triple.first.moveChildAfter(triple.second.second, triple.second.first);
                                         if (i > pathChildIndex) {
-                                            System.err.println("MOVE IN 02");
                                             moveChildAfter(pathChild, neighbor);
                                         }
-                                        System.err.println("FIX LEAVES 01");
                                         fixLeavesOn(triple.second.first, this, cycleNodes);
                                     }
                                 }
@@ -227,6 +227,12 @@ class PNode {
                     }
                 }
 
+                //System.err.println("CYCLE: " + cycleNodes);
+                System.err.print("CYCLE: ");
+                for (PNode n : cycleNodes) {
+                    System.err.print(n.myToString() + "      ");
+                }
+                System.err.println("");
                 // Push everything out that hasn't been pulled in
                 for (int pathni = 0; pathni < leftPath.size(); pathni++) {
                     PNode pathnode = leftPath.get(pathni);
@@ -238,9 +244,26 @@ class PNode {
 
 
                         if (i > pathChildIndex && pathnode.childrenCanBeSwapped(neighbor, pathChild)) {
+                            // have to fix leaves, if we push it into a new cycle
+                            Set<PNode> fixingBarrier = new HashSet<PNode>();
+                            PNode lmc = pathnode.findLeftmostChild(pathnode, fixingBarrier);
+
                             System.err.println("MOVE OUT 00");
                             achievedSomething = true;
                             pathnode.moveChildAfter(pathChild, neighbor);
+                            System.err.println(pathnode.myToString() + "   PC: " + pathChild.myToString() + "   NB: " + neighbor.myToString() + "   NC: " + pathnode.children.size());
+
+                            Set<PNode> barrier = new HashSet<PNode>();
+                            barrier.add(pathnode);
+                            for (PNode n : rightPath) {
+                                barrier.add(n);
+                            }
+                            if (!pathnode.isRoot() && !pathnode.parents.get(0).isRoot() && existsDisjointPathToRoot(lmc, barrier, fixingBarrier)) {
+                                System.err.println("FIXING " + neighbor.myToString() + " on " + lmc.myToString());
+                                fixLeavesOn(neighbor, lmc, fixingBarrier);
+                            }
+                        } else {
+                            pathnode.fixChildOrder(neighbor, pathChild);
                         }
                     }
                 }
@@ -254,9 +277,28 @@ class PNode {
                         PNode neighbor = pathnode.children.get(i).getNode();
 
                         if (i < pathChildIndex && pathnode.childrenCanBeSwapped(neighbor, pathChild)) {
+
+                            // have to fix leaves, if we push it into a new cycle
+                            Set<PNode> fixingBarrier = new HashSet<PNode>();
+                            PNode rmc = pathnode.findRightmostChild(pathnode, fixingBarrier);
+
                             System.err.println("MOVE OUT 01");
+                            System.err.println(pathnode.myToString() + "   PC: " + pathChild.myToString() + "   NB: " + neighbor.myToString() + "  NC: " + pathnode.children.size());
+                            System.err.println(children);
                             achievedSomething = true;
+
                             pathnode.moveChildAfter(neighbor, pathChild);
+                            Set<PNode> barrier = new HashSet<PNode>();
+                            barrier.add(pathnode);
+                            for (PNode n : rightPath) {
+                                barrier.add(n);
+                            }
+                            if (!pathnode.isRoot() && !pathnode.parents.get(0).isRoot() && existsDisjointPathToRoot(rmc, barrier, fixingBarrier)) {
+                                System.err.println("FIXING " + neighbor.myToString() + " on " + rmc.myToString());
+                                fixLeavesOn(neighbor, rmc, fixingBarrier);
+                            }
+                        } else {
+                            pathnode.fixChildOrder(neighbor, pathChild);
                         }
                     }
                 }
@@ -273,6 +315,32 @@ class PNode {
         return achievedSomething;
     }
 
+    private PNode findLeftmostChild(PNode root, Set<PNode> b) {
+        if (b != null) b.add(root);
+        return (root.children.isEmpty() ? root : root.children.get(0).getNode());
+    }
+
+    private PNode findRightmostChild(PNode root, Set<PNode> b) {
+        if (b != null) b.add(root);
+        return (root.children.isEmpty() ? root : root.children.get(root.children.size() - 1).getNode());
+    }
+
+    // returns true, if there is a path from leaf to the root without crossing the barrier
+    private boolean existsDisjointPathToRoot(PNode leaf, Collection<PNode> barrier, Set<PNode> nodes) {
+        if (leaf.isRoot()) return true;
+        for (PNode parent : leaf.parents) {
+            if (!barrier.contains(parent) && existsDisjointPathToRoot(parent, barrier, nodes)) {
+                nodes.add(leaf);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    String myToString() {
+        return getOriginalNode() == null ? "null" : getOriginalNode().getStringRepresentation();
+    }
+
     boolean allDependenciesResolvedOrInSet(Set<PNode> set) {
         for (PChild child : children) {
             if (!child.getNode().isResolved() && !set.contains(child.getNode())) return false;
@@ -284,16 +352,23 @@ class PNode {
     }
 
     void moveChildAfter(PNode first, PNode second) {
-        System.err.println("MOVE");
+        System.err.print("MOVE - before: ");
+        for (PChild child : children) {
+            System.err.print(child.getNode().myToString() + "   ");
+        }
         int fi = getChildIndex(first);
         int si = getChildIndex(second);
-        System.err.println("f: " + fi + "    s: " + si);
         PChild child = children.get(fi);
         assert fi < si;
         assert childrenCanBeSwapped(first, second);
         children.remove(fi);
         // not si + 1, because we've removed an element before, virtually shifting the index by one
         children.add(si, child);
+        System.err.print("\nMOVE - after: ");
+        for (PChild childd : children) {
+            System.err.print(childd.getNode().myToString() + "   ");
+        }
+        System.err.println("");
         fixChildOrder(first, second);
     }
 
@@ -316,6 +391,17 @@ class PNode {
         while (!nextLayer.isEmpty()) {
             Set<PNode> newNext = new HashSet<PNode>();
             for (PNode n : nextLayer) {
+                if (all.contains(n)) {
+                    System.err.println("WARNING: A CYCLE HAS BEEN DETECTED - WE'RE TRYING TO FIX IT");
+                    for (int i = 0; i < n.children.size(); i++) {
+                        PChild child = n.children.get(i);
+                        if (child.isFake()) {
+                            n.children.remove(child);
+                            child.getNode().parents.remove(n);
+                        }
+                    }
+                    continue;
+                }
                 all.add(n);
                 for (PChild c : n.children) {
                     newNext.add(c.getNode());
@@ -328,9 +414,15 @@ class PNode {
 
     void fixLeavesOn(PNode root, PNode fixPoint, Set<PNode> barrier) {
         // adds a fake edge from all the leaves of root to fixpoint unless they go through the barrier
-        if (barrier.contains(root)) return;
+        System.err.println("  ON " + fixPoint.myToString());
+        if (barrier.contains(root)) {
+            System.err.println("  blocked by " + root.myToString());
+            return;
+        }
         if (root.children.isEmpty()) {
-            root.children.add(new PChild(fixPoint, true, null));
+            System.err.println("  fixing " + root.myToString());
+            root.addChild(new PChild(fixPoint, true, null));
+            fixPoint.parents.add(root);
         } else {
             for (PChild child : root.getChildren()) {
                 fixLeavesOn(child.getNode(), fixPoint, barrier);
@@ -359,6 +451,7 @@ class PNode {
     }
 
     boolean childIsFake(PNode node) {
+        System.err.println("CHECKING: " + myToString() + "   " + node.myToString());
         return pnodeTochild.get(node).isFake();
     }
 

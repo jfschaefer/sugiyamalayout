@@ -12,7 +12,7 @@ public class DiGraph<V, E> {
     }
 
     public void addNode(V node, double width, double height) {
-        Node newNode = new Node(width, height);
+        Node newNode = new Node(width, height, node.toString());
         vToNode.put(node, newNode);
     }
 
@@ -25,7 +25,6 @@ public class DiGraph<V, E> {
     public Layout<V, E> generateLayout(Configuration config) {
         reset();
         removeCycles();
-        setLayers();
 
         LGraph lg;
         if (config.getUseAlternativeAlgorithm()) {
@@ -37,7 +36,12 @@ public class DiGraph<V, E> {
                 pg.addEdge(e);
             }
             lg = pg.getLGraph();
+            // CHEATING:
+            while (lg.topDownGreedySwapping()) {
+                System.err.println("CHEATING IN DIGRAPH");
+            }
         } else {
+            setLayers();
             lg = runSugiyama(config);
         }
 

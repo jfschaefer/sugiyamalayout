@@ -3,8 +3,8 @@ package de.jfschaefer.sugiyamalayout;
 public class Configuration implements java.io.Serializable {
     private double dummyNodeWidth = 25;
     private double initialNodeMargin = 121;
-    private double minimalNodeMargin = 36;
-    private double layerDistance = 121;
+    private double minimalNodeMargin = 16;
+    private double layerDistance = 64;
     private double graphPadding = 25;
     private boolean centralizeEdges = false;
     private boolean useBeziercurves = true;

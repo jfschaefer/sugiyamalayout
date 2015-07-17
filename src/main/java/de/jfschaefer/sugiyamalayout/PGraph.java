@@ -8,6 +8,7 @@ import java.util.*;
  */
 
 public class PGraph {
+    Set<Edge> edgeSet = new HashSet<Edge>();
     Map<Node, PNode> nodeMap = new HashMap<Node, PNode>();
     PNode root;    // A dummy node, which is the parent of all the sources
     Configuration config;
@@ -25,6 +26,7 @@ public class PGraph {
         PNode child = nodeMap.get(e.getEnd());
         child.addParent(parent);
         parent.addChild(new PChild(child, false, e));
+        edgeSet.add(e);
     }
 
     public LGraph getLGraph() {

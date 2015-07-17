@@ -9,14 +9,20 @@ class Node {
     private HashSet<Edge> ingoingEdges = new HashSet<Edge>();
     private HashSet<Edge> outgoingEdges = new HashSet<Edge>();
     private int layer = -1;
+    private String stringRepresentation;
     private boolean marker = false;   // The mark is only supposed to be used in the visualization.
                                       // It can be set for debugging purposes
                                       // Probably, it makes sense in the future to have a more sophisticated system
                                       // which allows the user of the library to set markers
 
-    Node(double width, double height) {
+    Node(double width, double height, String stringRepresentation) {
         this.width = width;
         this.height = height;
+        this.stringRepresentation = stringRepresentation;
+    }
+
+    String getStringRepresentation() {
+        return stringRepresentation;
     }
 
     double getWidth() {

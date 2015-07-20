@@ -6,6 +6,7 @@ import de.jfschaefer.sugiyamalayout.Util;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.CubicCurve;
+import javafx.scene.paint.Color;
 import javafx.scene.Node;
 
 import java.awt.geom.Point2D;
@@ -37,6 +38,8 @@ public class GraphFX<V, E> extends Pane {
                     }
                     CubicCurve segment = new CubicCurve(points.get(i).getX(), points.get(i).getY(), c0.getX(), c0.getY(),
                             c1.getX(), c1.getY(), points.get(i+1).getX(), points.get(i+1).getY());
+                    segment.setFill(Color.TRANSPARENT);
+                    segment.setStroke(Color.BLACK);
                     getChildren().add(segment);
                 }
             } else {

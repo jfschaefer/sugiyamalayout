@@ -70,6 +70,9 @@ class Layer {
             for (LNode child : lnode.getChildren()) {
                 positions.add(child.getPosition());
             }
+            if (positions.size() == 0) {
+                medianMap.put(lnode, -1);
+            }
             int i = 0;
             Iterator<Integer> iter = positions.iterator();
             while (i++ < positions.size() / 2) {

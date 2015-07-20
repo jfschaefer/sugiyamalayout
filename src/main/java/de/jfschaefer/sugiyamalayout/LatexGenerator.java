@@ -23,7 +23,7 @@ public class LatexGenerator<V, E> {
             } else {
                 result.append("pt] {");
             }
-            result.append(nodeNames.get(node));
+            result.append(nodeNames.get(node).replace('_', '-'));  //TODO: Do proper LaTeX escaping
             result.append("};\n");
         }
 

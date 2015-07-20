@@ -8,7 +8,7 @@ public class Configuration implements java.io.Serializable {
     private double graphPadding = 25;
     private boolean centralizeEdges = false;
     private boolean useBeziercurves = true;
-    private boolean useAlternativeAlgorithm = true;    // otherwise algorithm closer to original Sugiyama will be used
+    private boolean useAlternativeAlgorithm = false;    // otherwise algorithm closer to original Sugiyama will be used
 
 
     public double getDummyNodeWidth() {

@@ -70,15 +70,17 @@ class Layer {
             for (LNode child : lnode.getChildren()) {
                 positions.add(child.getPosition());
             }
-            if (positions.size() == 0) {
-                medianMap.put(lnode, -1);
-            }
             int i = 0;
             Iterator<Integer> iter = positions.iterator();
             while (i++ < positions.size() / 2) {
                 iter.next();
             }
-            medianMap.put(lnode, iter.next());
+
+            if (!iter.hasNext()) {
+                medianMap.put(lnode, -1);
+            } else {
+                medianMap.put(lnode, iter.next());
+            }
         }
         Collections.sort(nodes, new Comparator<LNode>() {
             @Override

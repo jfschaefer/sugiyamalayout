@@ -38,6 +38,8 @@ class Edge {
     }
 
     void generateLNodes() {
+        Node start = getStart();
+        Node end = getEnd();
         int size = end.getLayer() - start.getLayer() + 1;
         lnodes = new LNode[size];
         lnodes[0] = start.getLNode();

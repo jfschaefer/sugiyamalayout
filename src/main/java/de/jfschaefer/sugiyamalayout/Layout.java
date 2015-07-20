@@ -103,4 +103,8 @@ public class Layout<V, E> implements java.io.Serializable {
     public boolean nodeHasMarker(V node) {
         return getNodeNode(node).hasMarker();
     }
+
+    public Configuration getConfig() {
+        return config;
+    }
 }

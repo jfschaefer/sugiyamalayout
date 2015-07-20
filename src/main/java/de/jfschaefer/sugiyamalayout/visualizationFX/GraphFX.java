@@ -2,8 +2,10 @@ package de.jfschaefer.sugiyamalayout.visualizationFX;
 
 import de.jfschaefer.sugiyamalayout.EdgeLayout;
 import de.jfschaefer.sugiyamalayout.Layout;
+import de.jfschaefer.sugiyamalayout.Util;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Line;
+import javafx.scene.shape.CubicCurve;
 import javafx.scene.Node;
 
 import java.awt.geom.Point2D;
@@ -19,10 +21,30 @@ public class GraphFX<V, E> extends Pane {
         for (E edge: layout.getEdgeSet()) {
             EdgeLayout el = layout.getEdgeLayout(edge);
             ArrayList<Point2D> points = el.getPoints();
-            for (int i = 0; i < points.size() - 1; i++) {
-                Line segment = new Line(points.get(i).getX(), points.get(i).getY(),
-                                        points.get(i+1).getX(), points.get(i+1).getY());
-                getChildren().add(segment);
+            if (layout.getConfig().getUseBezierCurves()) {
+                for (int i = 0; i < points.size() - 1; i++) {
+                    Point2D c0;
+                    if (i == 0) {
+                        c0 = Util.translatePoint(points.get(0), Util.scalePoint(Util.getDelta(points.get(0), points.get(1)), 0.4));
+                    } else {
+                        c0 = Util.translatePoint(points.get(i), Util.scalePoint(Util.getDelta(points.get(i-1), points.get(i+1)), 0.2));
+                    }
+                    Point2D c1;
+                    if (i == points.size() - 2) {
+                        c1 = Util.translatePoint(points.get(i+1), Util.scalePoint(Util.getDelta(points.get(i), points.get(i+1)), -0.4));
+                    } else {
+                        c1 = Util.translatePoint(points.get(i+1), Util.scalePoint(Util.getDelta(points.get(i), points.get(i+2)), -0.2));
+                    }
+                    CubicCurve segment = new CubicCurve(points.get(i).getX(), points.get(i).getY(), c0.getX(), c0.getY(),
+                            c1.getX(), c1.getY(), points.get(i+1).getX(), points.get(i+1).getY());
+                    getChildren().add(segment);
+                }
+            } else {
+                for (int i = 0; i < points.size() - 1; i++) {
+                    Line segment = new Line(points.get(i).getX(), points.get(i).getY(),
+                            points.get(i+1).getX(), points.get(i+1).getY());
+                    getChildren().add(segment);
+                }
             }
         }
 

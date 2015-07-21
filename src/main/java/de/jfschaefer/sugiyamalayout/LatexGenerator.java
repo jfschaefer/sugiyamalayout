@@ -33,7 +33,7 @@ public class LatexGenerator<V, E> {
             ArrayList<Point2D> points = el.getPoints();
             for (int i = 0; i < points.size() - 1; i++) {
                 result.append("\\draw");
-                if (i == points.size() - 2) {
+                if (config.getDrawArrowHeads() && i == points.size() - 2) {
                     result.append("[->]");
                 }
                 result.append(" (");

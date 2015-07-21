@@ -8,6 +8,8 @@ import javafx.scene.shape.Line;
 import javafx.scene.shape.CubicCurve;
 import javafx.scene.paint.Color;
 import javafx.scene.Node;
+import javafx.scene.shape.Polygon;
+import javafx.scene.transform.Rotate;
 
 import java.awt.geom.Point2D;
 import java.util.*;
@@ -33,6 +35,15 @@ public class GraphFX<V, E> extends Pane {
                     Point2D c1;
                     if (i == points.size() - 2) {
                         c1 = Util.translatePoint(points.get(i+1), Util.scalePoint(Util.getDelta(points.get(i), points.get(i+1)), -0.4));
+                        if (layout.getConfig().getDrawArrowHeads()) {
+                            Polygon arrowhead = new Polygon(0d, 0d, 4d, 8d, -4d, 8d);
+                            double angle = Math.atan2(points.get(i+1).getY() - points.get(i).getY(),
+                                    points.get(i+1).getX() - points.get(i).getX());
+                            arrowhead.setLayoutX(points.get(i+1).getX());
+                            arrowhead.setLayoutY(points.get(i+1).getY());
+                            arrowhead.getTransforms().add(new Rotate(365d / (2 * Math.PI) * angle + 90, 0, 0));
+                            getChildren().add(arrowhead);
+                        }
                     } else {
                         c1 = Util.translatePoint(points.get(i+1), Util.scalePoint(Util.getDelta(points.get(i), points.get(i+2)), -0.2));
                     }

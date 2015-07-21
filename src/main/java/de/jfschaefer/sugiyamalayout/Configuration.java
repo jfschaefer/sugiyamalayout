@@ -9,6 +9,7 @@ public class Configuration implements java.io.Serializable {
     private boolean centralizeEdges = false;
     private boolean useBeziercurves = true;
     private boolean useAlternativeAlgorithm = false;    // otherwise algorithm closer to original Sugiyama will be used
+    private boolean drawArrowHeads = true;
 
 
     public double getDummyNodeWidth() {
@@ -75,5 +76,13 @@ public class Configuration implements java.io.Serializable {
 
     public boolean getUseAlternativeAlgorithm() {
         return useAlternativeAlgorithm;
+    }
+
+    public boolean getDrawArrowHeads() {
+        return drawArrowHeads;
+    }
+
+    public void setDrawArrowHeads(boolean drawArrowHeads) {
+        this.drawArrowHeads = drawArrowHeads;
     }
 }

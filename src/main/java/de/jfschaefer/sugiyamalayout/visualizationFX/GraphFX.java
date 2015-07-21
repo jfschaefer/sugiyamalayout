@@ -77,13 +77,13 @@ public class GraphFX<V, E> extends Pane {
                     public void changed(ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue) {
                         l2.getTransforms().clear();
                         l2.setLayoutX(el.getLabelPosition().first.getX() - 0.5 * newValue.getWidth());
-                        l2.setLayoutY(el.getLabelPosition().first.getY());
-                        l2.getTransforms().add(new Rotate(365d / (2 * Math.PI) * el.getLabelPosition().second, l2.getWidth() * 0.5, 0));
+                        l2.setLayoutY(el.getLabelPosition().first.getY() - l2.getHeight());
+                        l2.getTransforms().add(new Rotate(365d / (2 * Math.PI) * el.getLabelPosition().second, l2.getWidth() * 0.5, l2.getHeight()));
                     }
                 });
                 label.setLayoutX(el.getLabelPosition().first.getX() - label.getWidth()*0.5);
-                label.setLayoutY(el.getLabelPosition().first.getY());
-                label.getTransforms().add(new Rotate(365d / (2 * Math.PI) * el.getLabelPosition().second, label.getWidth() * 0.5, 0));
+                label.setLayoutY(el.getLabelPosition().first.getY() - label.getHeight());
+                label.getTransforms().add(new Rotate(365d / (2 * Math.PI) * el.getLabelPosition().second, label.getWidth() * 0.5, label.getHeight()));
                 getChildren().add(label);
             }
         }

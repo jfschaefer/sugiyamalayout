@@ -28,4 +28,17 @@ public class Util {
         }
         return true;
     }
+
+    public static Point2D bezier(Point2D start, Point2D control1, Point2D control2, Point2D end, double lambda) {
+        return translatePoint(scalePoint(start, (1-lambda)*(1-lambda)*(1-lambda)),
+                translatePoint(scalePoint(control1, 3*(1-lambda)*(1-lambda)*lambda),
+                translatePoint(scalePoint(control2, 3*(1-lambda)*lambda*lambda),
+                scalePoint(end, lambda*lambda*lambda))));
+    }
+
+    public static Point2D bezierDerivative(Point2D start, Point2D control1, Point2D control2, Point2D end, double lambda) {
+        return translatePoint(scalePoint(getDelta(start, control1), 3*(1-lambda)*(1-lambda)),
+                translatePoint(scalePoint(getDelta(control1, control2), 6*(1-lambda)*lambda),
+                scalePoint(getDelta(control2, end), 3*lambda*lambda)));
+    }
 }

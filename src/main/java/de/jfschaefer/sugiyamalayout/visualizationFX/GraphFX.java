@@ -1,8 +1,10 @@
 package de.jfschaefer.sugiyamalayout.visualizationFX;
 
+import de.jfschaefer.sugiyamalayout.Configuration;
 import de.jfschaefer.sugiyamalayout.EdgeLayout;
 import de.jfschaefer.sugiyamalayout.Layout;
 import de.jfschaefer.sugiyamalayout.Util;
+import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.CubicCurve;
@@ -15,7 +17,8 @@ import java.awt.geom.Point2D;
 import java.util.*;
 
 public class GraphFX<V, E> extends Pane {
-    public GraphFX(Layout<V, E> layout, GraphFXNodeFactory<V> nodeFactory) {
+    public GraphFX(Layout<V, E> layout, GraphFXNodeFactory<V> nodeFactory, Map<E, String> edgeLabels) {
+        Configuration config = layout.getConfig();
         minWidth(layout.getWidth());
         maxWidth(layout.getWidth());
         minHeight(layout.getHeight());
@@ -28,13 +31,13 @@ public class GraphFX<V, E> extends Pane {
                 for (int i = 0; i < points.size() - 1; i++) {
                     Point2D c0;
                     if (i == 0) {
-                        c0 = Util.translatePoint(points.get(0), Util.scalePoint(Util.getDelta(points.get(0), points.get(1)), 0.4));
+                        c0 = Util.translatePoint(points.get(0), Util.scalePoint(Util.getDelta(points.get(0), points.get(1)), 2 * config.getControlPointDistance()));
                     } else {
-                        c0 = Util.translatePoint(points.get(i), Util.scalePoint(Util.getDelta(points.get(i-1), points.get(i+1)), 0.2));
+                        c0 = Util.translatePoint(points.get(i), Util.scalePoint(Util.getDelta(points.get(i-1), points.get(i+1)), config.getControlPointDistance()));
                     }
                     Point2D c1;
                     if (i == points.size() - 2) {
-                        c1 = Util.translatePoint(points.get(i+1), Util.scalePoint(Util.getDelta(points.get(i), points.get(i+1)), -0.4));
+                        c1 = Util.translatePoint(points.get(i+1), Util.scalePoint(Util.getDelta(points.get(i), points.get(i+1)), -2*config.getControlPointDistance()));
                         if (layout.getConfig().getDrawArrowHeads()) {
                             Polygon arrowhead = new Polygon(0d, 0d, 4d, 8d, -4d, 8d);
                             double angle = Math.atan2(points.get(i+1).getY() - points.get(i).getY(),
@@ -45,7 +48,7 @@ public class GraphFX<V, E> extends Pane {
                             getChildren().add(arrowhead);
                         }
                     } else {
-                        c1 = Util.translatePoint(points.get(i+1), Util.scalePoint(Util.getDelta(points.get(i), points.get(i+2)), -0.2));
+                        c1 = Util.translatePoint(points.get(i+1), Util.scalePoint(Util.getDelta(points.get(i), points.get(i+2)), -config.getControlPointDistance()));
                     }
                     CubicCurve segment = new CubicCurve(points.get(i).getX(), points.get(i).getY(), c0.getX(), c0.getY(),
                             c1.getX(), c1.getY(), points.get(i+1).getX(), points.get(i+1).getY());
@@ -59,6 +62,13 @@ public class GraphFX<V, E> extends Pane {
                             points.get(i+1).getX(), points.get(i+1).getY());
                     getChildren().add(segment);
                 }
+            }
+            if (config.getDrawLabels()) {
+                Label label = new Label(edgeLabels.get(edge) + "\n");
+                label.setLayoutX(el.getLabelPosition().first.getX());
+                label.setLayoutY(el.getLabelPosition().first.getY());
+                label.getTransforms().add(new Rotate(365d / (2 * Math.PI) * el.getLabelPosition().second, 0, 0));
+                getChildren().add(label);
             }
         }
 

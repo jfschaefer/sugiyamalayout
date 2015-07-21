@@ -62,4 +62,13 @@ class Edge {
         if (lnodes == null) generateLNodes();
         return Arrays.copyOfRange(lnodes, 1, lnodes.length - 1);
     }
+
+    // (LNode before, ratio (to next LNode), onNode)
+    Triple<Integer, Double, Boolean> getLabelPos() {
+        if (end.getLayer() > start.getLayer() + 1) {
+            return new Triple<Integer, Double, Boolean>(1, 0d, true);
+        } else {
+            return new Triple<Integer, Double, Boolean>(0, 0.5d, false);
+        }
+    }
 }

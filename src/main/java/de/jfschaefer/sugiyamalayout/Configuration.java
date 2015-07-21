@@ -6,10 +6,12 @@ public class Configuration implements java.io.Serializable {
     private double minimalNodeMargin = 16;
     private double layerDistance = 64;
     private double graphPadding = 25;
+    private double controlPointDistance = 0.2;
     private boolean centralizeEdges = false;
     private boolean useBeziercurves = true;
     private boolean useAlternativeAlgorithm = false;    // otherwise algorithm closer to original Sugiyama will be used
     private boolean drawArrowHeads = true;
+    private boolean drawLabels = true;
 
 
     public double getDummyNodeWidth() {
@@ -54,6 +56,14 @@ public class Configuration implements java.io.Serializable {
         minimalNodeMargin = margin;
     }
 
+    public double getControlPointDistance() {
+        return controlPointDistance;
+    }
+
+    public void setControlPointDistance(double distance) {
+        controlPointDistance = distance;
+    }
+
     public boolean getCentralizeEdges() {
         return centralizeEdges;
     }
@@ -84,5 +94,13 @@ public class Configuration implements java.io.Serializable {
 
     public void setDrawArrowHeads(boolean drawArrowHeads) {
         this.drawArrowHeads = drawArrowHeads;
+    }
+
+    public boolean getDrawLabels() {
+        return drawLabels;
+    }
+
+    public void setDrawLabels(boolean drawLabels) {
+        this.drawLabels = drawLabels;
     }
 }

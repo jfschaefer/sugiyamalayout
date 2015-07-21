@@ -4,6 +4,10 @@ import de.jfschaefer.sugiyamalayout.Configuration;
 import de.jfschaefer.sugiyamalayout.EdgeLayout;
 import de.jfschaefer.sugiyamalayout.Layout;
 import de.jfschaefer.sugiyamalayout.Util;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.geometry.Bounds;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Line;
@@ -11,6 +15,7 @@ import javafx.scene.shape.CubicCurve;
 import javafx.scene.paint.Color;
 import javafx.scene.Node;
 import javafx.scene.shape.Polygon;
+import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Rotate;
 
 import java.awt.geom.Point2D;
@@ -25,7 +30,7 @@ public class GraphFX<V, E> extends Pane {
         maxHeight(layout.getHeight());
 
         for (E edge: layout.getEdgeSet()) {
-            EdgeLayout el = layout.getEdgeLayout(edge);
+            final EdgeLayout el = layout.getEdgeLayout(edge);
             ArrayList<Point2D> points = el.getPoints();
             if (layout.getConfig().getUseBezierCurves()) {
                 for (int i = 0; i < points.size() - 1; i++) {
@@ -64,10 +69,21 @@ public class GraphFX<V, E> extends Pane {
                 }
             }
             if (config.getDrawLabels()) {
-                Label label = new Label(edgeLabels.get(edge) + "\n");
-                label.setLayoutX(el.getLabelPosition().first.getX());
+                Label label = new Label(edgeLabels.get(edge));
+                label.setStyle("-fx-font-size: 0.8em;");
+                final Label l2 = label;
+                label.boundsInLocalProperty().addListener(new ChangeListener<Bounds>() {
+                    @Override
+                    public void changed(ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue) {
+                        l2.getTransforms().clear();
+                        l2.setLayoutX(el.getLabelPosition().first.getX() - 0.5 * newValue.getWidth());
+                        l2.setLayoutY(el.getLabelPosition().first.getY());
+                        l2.getTransforms().add(new Rotate(365d / (2 * Math.PI) * el.getLabelPosition().second, l2.getWidth() * 0.5, 0));
+                    }
+                });
+                label.setLayoutX(el.getLabelPosition().first.getX() - label.getWidth()*0.5);
                 label.setLayoutY(el.getLabelPosition().first.getY());
-                label.getTransforms().add(new Rotate(365d / (2 * Math.PI) * el.getLabelPosition().second, 0, 0));
+                label.getTransforms().add(new Rotate(365d / (2 * Math.PI) * el.getLabelPosition().second, label.getWidth() * 0.5, 0));
                 getChildren().add(label);
             }
         }

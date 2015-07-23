@@ -65,6 +65,17 @@ public class GraphFX<V, E> extends Pane {
                 for (int i = 0; i < points.size() - 1; i++) {
                     Line segment = new Line(points.get(i).getX(), points.get(i).getY(),
                             points.get(i+1).getX(), points.get(i+1).getY());
+                    if (i == points.size() - 2 && layout.getConfig().getDrawArrowHeads()) {
+                        if (layout.getConfig().getDrawArrowHeads()) {
+                            Polygon arrowhead = new Polygon(0d, 0d, 4d, 8d, -4d, 8d);
+                            double angle = Math.atan2(points.get(i+1).getY() - points.get(i).getY(),
+                                    points.get(i+1).getX() - points.get(i).getX());
+                            arrowhead.setLayoutX(points.get(i+1).getX());
+                            arrowhead.setLayoutY(points.get(i+1).getY());
+                            arrowhead.getTransforms().add(new Rotate(365d / (2 * Math.PI) * angle + 90, 0, 0));
+                            getChildren().add(arrowhead);
+                        }
+                    }
                     getChildren().add(segment);
                 }
             }

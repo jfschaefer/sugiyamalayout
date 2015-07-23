@@ -47,6 +47,17 @@ public class Layout<V, E> implements java.io.Serializable {
             if (maxy > maxY) maxY = maxy;
         }
 
+        for (Edge edge : edges.values()) {
+            for (LNode l : edge.getDummyLNodes()) {
+                if (l.getLeftPixelOffset() < minX) {
+                    minX = l.getLeftPixelOffset();
+                }
+                if (l.getRightPixelOffset() > maxX) {
+                    maxX = l.getRightPixelOffset();
+                }
+            }
+        }
+
         shiftX = -minX + config.getGraphPadding();
         shiftY = -minY + config.getGraphPadding();
 

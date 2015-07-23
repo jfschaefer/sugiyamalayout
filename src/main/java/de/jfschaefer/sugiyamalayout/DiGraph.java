@@ -37,9 +37,9 @@ public class DiGraph<V, E> {
             }
             lg = pg.getLGraph();
             // CHEATING:
-            while (lg.topDownGreedySwapping()) {
-                System.err.println("CHEATING IN DIGRAPH");
-            }
+            //while (lg.topDownGreedySwapping()) {
+            //    System.err.println("CHEATING IN DIGRAPH");
+            //}
         } else {
             setLayers();
             lg = runSugiyama(config);

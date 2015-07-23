@@ -9,7 +9,7 @@ public class Configuration implements java.io.Serializable {
     private double controlPointDistance = 0.2;
     private boolean centralizeEdges = false;
     private boolean useBeziercurves = true;
-    private boolean useAlternativeAlgorithm = false;    // otherwise algorithm closer to original Sugiyama will be used
+    private boolean useAlternativeAlgorithm = true;    // otherwise algorithm closer to original Sugiyama will be used
     private boolean drawArrowHeads = true;
     private boolean drawLabels = true;
 

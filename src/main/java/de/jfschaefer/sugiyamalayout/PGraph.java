@@ -37,19 +37,117 @@ public class PGraph {
             source.addParent(root);
         }
 
-        while (root.tryToResolve());
-
-        for (PNode node : nodeMap.values()) {
-            if (node.isResolved() && !node.isRoot()) {
-                node.getOriginalNode().setMarker(true);
-            }
-        }
+        runAlgorithm();
 
         setLayers();
         LGraph lg = new LGraph(config);
         fillLGraphDFS(lg, root);
         return lg;
     }
+
+
+    public void runAlgorithm() {
+        Random random = new Random();
+        // parents with at least two children
+        Set<PNode> interestingParents = new HashSet<PNode>();
+        // children with at least two parents
+        Set<PNode> interestingChildren = new HashSet<PNode>();
+
+        for (PNode node : nodeMap.values()) {
+            if (node.getChildren().size() >= 2) {
+                interestingParents.add(node);
+            }
+            if (node.getParents().size() >= 2) {
+                interestingChildren.add(node);
+            }
+        }
+
+        /*
+            FIND INITIAL CYCLES
+         */
+
+        System.err.println("INITIAL CYCLES\n==============\n");
+
+        ArrayList<PCycle> initialPCycles = new ArrayList<PCycle>();
+        for (PNode sink : interestingChildren) {
+            ArrayList<PNode> parents = sink.getParentsAsArrayList();
+            for (int i = 0; i < parents.size(); i++) {
+                for (int j = i + 1; j < parents.size(); j++) {
+                    PNode a = parents.get(i);
+                    PNode b = parents.get(j);
+
+                    ArrayList<PNode> pathA = new ArrayList<PNode>();
+                    pathA.add(a);
+                    while (!a.isRoot()) {
+                        a = a.getParentsAsArrayList().get(random.nextInt(a.getParents().size()));
+                        pathA.add(a);
+                    }
+
+                    ArrayList<PNode> pathB = new ArrayList<PNode>();
+                    while (!pathA.contains(b)) {
+                        pathB.add(b);
+                        b = b.getParentsAsArrayList().get(random.nextInt(b.getParents().size()));
+                    }
+
+                    PCycle cycle = new PCycle(b, sink);
+                    for (PNode p : pathA) {
+                        if (p == b) break;
+                        cycle.addToLeftBranch(p);
+                        a = p;
+                    }
+                    for (PNode p : pathB) {
+                        cycle.addToRightBranch(p);
+                    }
+
+                    if (b.getChildIndex(a) > b.getChildIndex(pathB.size() == 0 ? sink : pathB.get(pathB.size() - 1))) {
+                        cycle.swapBranches();
+                    }
+                    initialPCycles.add(cycle);
+                    System.err.println(cycle.toString());
+                }
+            }
+
+        }
+
+        // The depths of the nodes. Node that these will change during the process as so called fake edges can be added.
+        // Due to the nature of the algorithm, it's not important to update the depths though.
+        // Of course new depths have to be calculate in the end for the LGraph generation
+        final Map<PNode, Integer> pnodeDepths = new HashMap<PNode, Integer>();
+        pnodeDepths.put(root, 1);
+        setPNDepths(pnodeDepths, root, 1);
+
+        // Sort initialPCycles by increasing depth of sinks (not sure if it helps, but intuitively, it's a good idea
+        Collections.sort(initialPCycles, new Comparator<PCycle>() {
+            @Override
+            public int compare(PCycle o1, PCycle o2) {
+                return pnodeDepths.get(o2.getSink()).compareTo(pnodeDepths.get(o1.getSink()));
+            }
+        });
+
+        for (PCycle cycle : initialPCycles) {
+            if (cycle.getState() == PCycle.FIXED) continue;
+            cycle.fix();
+        }
+    }
+
+    private void setPNDepths(Map<PNode, Integer> depths, PNode root, int rootDepth) {
+        for (PChild child : root.getChildren()) {
+            PNode n = child.getNode();
+            if (!depths.containsKey(n) || depths.get(n) < rootDepth + 1) {
+                depths.put(n, rootDepth + 1);
+                setPNDepths(depths, n, rootDepth + 1);
+            }
+        }
+    }
+
+
+
+
+
+
+    /*
+        AFTER ALGORITHM: SET LAYERS AND POPULATE (FILL) LGRAPH
+     */
 
     private void setLayers() {
         Iterator<PNode> sourceIter = root.getChildPNodeIterator();

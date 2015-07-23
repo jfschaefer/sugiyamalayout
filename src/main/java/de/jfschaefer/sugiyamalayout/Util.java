@@ -26,7 +26,7 @@ public class Util {
         for (Object x : smaller) {
             if (larger.contains(x)) return true;
         }
-        return true;
+        return false;
     }
 
     public static Point2D bezier(Point2D start, Point2D control1, Point2D control2, Point2D end, double lambda) {

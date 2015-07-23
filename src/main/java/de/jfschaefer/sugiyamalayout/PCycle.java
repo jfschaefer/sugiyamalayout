@@ -139,9 +139,7 @@ public class PCycle {
                         if (Util.setsIntersect(ld.second, descendants) && !(Util.setsIntersect(ld.second, sinkDescendants) || sinkDescendants.contains(ld.first.second))) {
                             foundIntersection = true;
                             // pull neighbors in the cycle and fix them (if they aren't yet)
-                            boolean isOkay = false;
                             if (branchNode.childrenCanBeSwapped(neighbor, branchChildNode)) {
-                                isOkay = true;
                                 branchNode.moveChildAfter(branchChildNode, neighbor);  //also fixes them
                             }
                             PNode otherBranchNode = leftBranch.get(ld.first.first);
@@ -149,7 +147,7 @@ public class PCycle {
                             PNode otherNeighbor = ld.first.second;
                             System.err.println("  found intersection: " + branchNode + "->" + neighbor + " - " + otherBranchNode + "->" + otherNeighbor);
                             System.err.println("    " + descendants + "  -  " + ld.second);
-                            if (isOkay && otherBranchNode.childrenCanBeSwapped(otherNeighbor, otherBranchChildNode)) {
+                            if (otherBranchNode.childrenCanBeSwapped(otherNeighbor, otherBranchChildNode)) {
                                 otherBranchNode.moveChildAfter(otherNeighbor, otherBranchChildNode);
                                 if (otherBranchNode.getChildIndex(otherBranchChildNode) < otherBranchNode.getChildIndex(otherNeighbor) &&
                                         branchNode.getChildIndex(neighbor) < branchNode.getChildIndex(branchChildNode)) {
@@ -169,33 +167,35 @@ public class PCycle {
                             System.err.println("  swapping " + neighbor + " " + branchChildNode);
                             branchNode.moveChildAfter(neighbor, branchChildNode);   //also fixes them
                         }
-                        if (isOkay && branchNode.getChildIndex(neighbor) < branchNode.getChildIndex(branchChildNode)) {
-                            System.err.println("  new fixing1 " + neighbor + " on " + sink);
-                            PNode.fixLeavesOn(neighbor, sink, cycleNodes);
+                        if (branchNode.getChildIndex(neighbor) < branchNode.getChildIndex(branchChildNode)) {
+                            if (!Util.setsIntersect(PNode.getDirectDescendantsInclusive(neighbor), PNode.getDirectDescendantsInclusive(sink))) {
+                                System.err.println("  new fixing1 " + neighbor + " on " + sink);
+                                PNode.fixLeavesOn(neighbor, sink, cycleNodes);
+                            }
                         }
-                        if (isOkay) {
-                            for (PCycle otherCycle: branchNode.getPCycles()) {
-                                if (otherCycle == this) continue;
-                                if (otherCycle.getState() == NOT_FIXED) {
-                                    otherCycle.fix();
-                                }
-                                if (otherCycle.inLeftBranch(branchNode)) {
-                                    PNode otherBranchChildNode = otherCycle.getLeftBranchChild(branchNode);
-                                    if (branchNode.getChildIndex(neighbor) > branchNode.getChildIndex(otherBranchChildNode)) {
-                                        System.err.println("  fixingb " + neighbor + " on " + otherCycle.getSink());
-                                        if (!Util.setsIntersect(PNode.getDirectDescendantsInclusive(neighbor), PNode.getDirectDescendantsInclusive(otherCycle.getSink()))) {
-                                            PNode.fixLeavesOn(neighbor, otherCycle.getSink(), otherCycle.getCycleNodes());
-                                        }
+                        for (PCycle otherCycle: branchNode.getPCycles()) {
+                            if (otherCycle == this) continue;
+                            if (otherCycle.getState() == NOT_FIXED) {
+                                otherCycle.fix();
+                            }
+                            if (otherCycle.inLeftBranch(branchNode)) {
+                                PNode otherBranchChildNode = otherCycle.getLeftBranchChild(branchNode);
+                                if (branchNode.getChildIndex(neighbor) > branchNode.getChildIndex(otherBranchChildNode)) {
+                                    System.err.println("  fixingb " + neighbor + " on " + otherCycle.getSink());
+                                    if (!Util.setsIntersect(PNode.getDirectDescendantsInclusive(neighbor), PNode.getDirectDescendantsInclusive(otherCycle.getSink()))) {
+                                        PNode.fixLeavesOn(neighbor, otherCycle.getSink(), otherCycle.getCycleNodes());
                                     }
                                 }
                             }
                         }
                     }
                 } else {
-                    /* if (branchNode.getChildIndex(neighbor) < branchNode.getChildIndex(branchChildNode)) {
-                        System.err.println("  WRONG new fixing " + neighbor + " on " + sink);
-                        PNode.fixLeavesOn(neighbor, sink, cycleNodes);
-                    } */
+                    if (branchNode.getChildIndex(neighbor) < branchNode.getChildIndex(branchChildNode)) {
+                        if (!Util.setsIntersect(PNode.getDirectDescendantsInclusive(neighbor), PNode.getDirectDescendantsInclusive(sink))) {
+                            System.err.println("  WRONG new fixing " + neighbor + " on " + sink);
+                            PNode.fixLeavesOn(neighbor, sink, cycleNodes);
+                        }
+                    }
                 }
             }
         }
@@ -206,29 +206,27 @@ public class PCycle {
             PNode branchChildNode = ld.first.first == 0 ? sink : leftBranch.get(ld.first.first - 1);
             PNode neighbor = ld.first.second;
             System.err.println("    checking " + branchNode + "  " + neighbor);
-            boolean isOkay = false;
             if (branchNode.childrenCanBeSwapped(branchChildNode, neighbor)) {
-                isOkay = true;
                 System.err.println("  moving " + branchChildNode + " " + neighbor);
                 branchNode.moveChildAfter(branchChildNode, neighbor);
             }
-            if (isOkay && branchNode.getChildIndex(neighbor) > branchNode.getChildIndex(branchChildNode)) {
-                System.err.println("  new fixing2 " + neighbor + " on " + sink);
-                //PNode.fixLeavesOn(neighbor, sink, cycleNodes);
+            if (branchNode.getChildIndex(neighbor) > branchNode.getChildIndex(branchChildNode)) {
+                if (!Util.setsIntersect(PNode.getDirectDescendantsInclusive(neighbor), PNode.getDirectDescendantsInclusive(sink))) {
+                    System.err.println("  new fixing2 " + neighbor + " on " + sink);
+                    PNode.fixLeavesOn(neighbor, sink, cycleNodes);
+                }
             }
-            if (isOkay) {
-                for (PCycle otherCycle : branchNode.getPCycles()) {
-                    if (otherCycle == this) continue;
-                    if (otherCycle.getState() == NOT_FIXED) {
-                        otherCycle.fix();
-                    }
-                    if (otherCycle.inRightBranch(branchNode)) {
-                        PNode otherBranchChildNode = otherCycle.getRightBranchChild(branchNode);
-                        if (branchNode.getChildIndex(neighbor) < branchChildNode.getChildIndex(otherBranchChildNode)) {
-                            System.err.println("  fixinga " + neighbor + " on " + otherCycle.getSink());
-                            if (!Util.setsIntersect(PNode.getDirectDescendantsInclusive(neighbor), PNode.getDirectDescendantsInclusive(otherCycle.getSink()))) {
-                                PNode.fixLeavesOn(neighbor, otherCycle.getSink(), otherCycle.getCycleNodes());
-                            }
+            for (PCycle otherCycle : branchNode.getPCycles()) {
+                if (otherCycle == this) continue;
+                if (otherCycle.getState() == NOT_FIXED) {
+                    otherCycle.fix();
+                }
+                if (otherCycle.inRightBranch(branchNode)) {
+                    PNode otherBranchChildNode = otherCycle.getRightBranchChild(branchNode);
+                    if (branchNode.getChildIndex(neighbor) < branchChildNode.getChildIndex(otherBranchChildNode)) {
+                        System.err.println("  fixinga " + neighbor + " on " + otherCycle.getSink());
+                        if (!Util.setsIntersect(PNode.getDirectDescendantsInclusive(neighbor), PNode.getDirectDescendantsInclusive(otherCycle.getSink()))) {
+                            PNode.fixLeavesOn(neighbor, otherCycle.getSink(), otherCycle.getCycleNodes());
                         }
                     }
                 }

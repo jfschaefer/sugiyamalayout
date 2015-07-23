@@ -113,11 +113,31 @@ class PNode {
         }
     }
 
+    static Set<PNode> getDirectDescendantsInclusive(PNode root) {
+        Set<PNode> all = new HashSet<PNode>();
+        all.add(root);
+        Set<PNode> nextLayer = new HashSet<PNode>();
+        for (PChild child : root.getChildren()) {
+            /*if (!child.isFake()) */ nextLayer.add(child.getNode());
+        }
+        while (!nextLayer.isEmpty()) {
+            Set<PNode> newNext = new HashSet<PNode>();
+            for (PNode n : nextLayer) {
+                all.add(n);
+                for (PChild c : n.children) {
+                    /*if (!c.isFake()) */newNext.add(c.getNode());
+                }
+            }
+            nextLayer = newNext;
+        }
+        return all;
+    }
+
     static Set<PNode> getDirectDescendants(PNode root) {
         Set<PNode> all = new HashSet<PNode>();
         Set<PNode> nextLayer = new HashSet<PNode>();
         for (PChild child : root.getChildren()) {
-            nextLayer.add(child.getNode());
+            /* if (!child.isFake()) */ nextLayer.add(child.getNode());
         }
         while (!nextLayer.isEmpty()) {
             Set<PNode> newNext = new HashSet<PNode>();
@@ -135,7 +155,7 @@ class PNode {
                 } */
                 all.add(n);
                 for (PChild c : n.children) {
-                    if (!c.isFake()) newNext.add(c.getNode());
+                    /* if (!c.isFake()) */ newNext.add(c.getNode());
                 }
             }
             nextLayer = newNext;
@@ -146,7 +166,7 @@ class PNode {
         Set<PNode> all = new HashSet<PNode>();
         Set<PNode> nextLayer = new HashSet<PNode>();
         for (PChild child : root.getChildren()) {
-            if (!barrier.contains(child.getNode())) {
+            if (!child.isFake() && !barrier.contains(child.getNode())) {
                 nextLayer.add(child.getNode());
             }
         }

@@ -132,11 +132,11 @@ public class PCycle {
                     descendants.add(neighbor);
                     System.err.println("Right Descendants (" + branchNode + "->" + neighbor + "): " + descendants);
                     boolean foundIntersection = false;
-                    Set<PNode> sinkDescendants = PNode.getDirectDescendants(sink);
-                    if (Util.setsIntersect(descendants, sinkDescendants)) continue;
+                    Set<PNode> sinkDescendants = PNode.getDirectDescendantsInclusive(sink);
+                    if (Util.setsIntersect(descendants, sinkDescendants) || sinkDescendants.contains(neighbor)) continue;
                     // find matching left descendant
                     for (Pair<Pair<Integer, PNode>, Set<PNode>> ld : leftDescendants) {
-                        if (Util.setsIntersect(ld.second, descendants) && !Util.setsIntersect(ld.second, sinkDescendants)) {
+                        if (Util.setsIntersect(ld.second, descendants) && !(Util.setsIntersect(ld.second, sinkDescendants) || sinkDescendants.contains(ld.first.second))) {
                             foundIntersection = true;
                             // pull neighbors in the cycle and fix them (if they aren't yet)
                             boolean isOkay = false;
@@ -182,8 +182,10 @@ public class PCycle {
                                 if (otherCycle.inLeftBranch(branchNode)) {
                                     PNode otherBranchChildNode = otherCycle.getLeftBranchChild(branchNode);
                                     if (branchNode.getChildIndex(neighbor) > branchNode.getChildIndex(otherBranchChildNode)) {
-                                        System.err.println("  fixing " + neighbor + " on " + otherCycle.getSink());
-                                        PNode.fixLeavesOn(neighbor, otherCycle.getSink(), otherCycle.getCycleNodes());
+                                        System.err.println("  fixingb " + neighbor + " on " + otherCycle.getSink());
+                                        if (!Util.setsIntersect(PNode.getDirectDescendantsInclusive(neighbor), PNode.getDirectDescendantsInclusive(otherCycle.getSink()))) {
+                                            PNode.fixLeavesOn(neighbor, otherCycle.getSink(), otherCycle.getCycleNodes());
+                                        }
                                     }
                                 }
                             }
@@ -223,8 +225,10 @@ public class PCycle {
                     if (otherCycle.inRightBranch(branchNode)) {
                         PNode otherBranchChildNode = otherCycle.getRightBranchChild(branchNode);
                         if (branchNode.getChildIndex(neighbor) < branchChildNode.getChildIndex(otherBranchChildNode)) {
-                            System.err.println("  fixing " + neighbor + " on " + otherCycle.getSink());
-                            PNode.fixLeavesOn(neighbor, otherCycle.getSink(), otherCycle.getCycleNodes());
+                            System.err.println("  fixinga " + neighbor + " on " + otherCycle.getSink());
+                            if (!Util.setsIntersect(PNode.getDirectDescendantsInclusive(neighbor), PNode.getDirectDescendantsInclusive(otherCycle.getSink()))) {
+                                PNode.fixLeavesOn(neighbor, otherCycle.getSink(), otherCycle.getCycleNodes());
+                            }
                         }
                     }
                 }

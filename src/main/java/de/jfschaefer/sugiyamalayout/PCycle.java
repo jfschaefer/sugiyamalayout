@@ -132,12 +132,16 @@ public class PCycle {
                     descendants.add(neighbor);
                     System.err.println("Right Descendants (" + branchNode + "->" + neighbor + "): " + descendants);
                     boolean foundIntersection = false;
+                    Set<PNode> sinkDescendants = PNode.getDirectDescendants(sink);
+                    if (Util.setsIntersect(descendants, sinkDescendants)) continue;
                     // find matching left descendant
                     for (Pair<Pair<Integer, PNode>, Set<PNode>> ld : leftDescendants) {
-                        if (Util.setsIntersect(ld.second, descendants)) {
+                        if (Util.setsIntersect(ld.second, descendants) && !Util.setsIntersect(ld.second, sinkDescendants)) {
                             foundIntersection = true;
                             // pull neighbors in the cycle and fix them (if they aren't yet)
+                            boolean isOkay = false;
                             if (branchNode.childrenCanBeSwapped(neighbor, branchChildNode)) {
+                                isOkay = true;
                                 branchNode.moveChildAfter(branchChildNode, neighbor);  //also fixes them
                             }
                             PNode otherBranchNode = leftBranch.get(ld.first.first);
@@ -145,14 +149,14 @@ public class PCycle {
                             PNode otherNeighbor = ld.first.second;
                             System.err.println("  found intersection: " + branchNode + "->" + neighbor + " - " + otherBranchNode + "->" + otherNeighbor);
                             System.err.println("    " + descendants + "  -  " + ld.second);
-                            if (otherBranchNode.childrenCanBeSwapped(otherNeighbor, otherBranchChildNode)) {
+                            if (isOkay && otherBranchNode.childrenCanBeSwapped(otherNeighbor, otherBranchChildNode)) {
                                 otherBranchNode.moveChildAfter(otherNeighbor, otherBranchChildNode);
-                            }
-                            if (otherBranchNode.getChildIndex(otherBranchChildNode) < otherBranchNode.getChildIndex(otherNeighbor) &&
-                                    branchNode.getChildIndex(neighbor) < branchNode.getChildIndex(branchChildNode)) {
-                                // The descendants are in the cycle :-)
-                                PNode.fixLeavesOn(neighbor, sink, cycleNodes);
-                                PNode.fixLeavesOn(otherNeighbor, sink, cycleNodes);
+                                if (otherBranchNode.getChildIndex(otherBranchChildNode) < otherBranchNode.getChildIndex(otherNeighbor) &&
+                                        branchNode.getChildIndex(neighbor) < branchNode.getChildIndex(branchChildNode)) {
+                                    // The descendants are in the cycle :-)
+                                    PNode.fixLeavesOn(neighbor, sink, cycleNodes);
+                                    PNode.fixLeavesOn(otherNeighbor, sink, cycleNodes);
+                                }
                             }
                         }
 

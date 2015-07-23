@@ -113,7 +113,7 @@ class PNode {
         }
     }
 
-    Set<PNode> getDirectDescendants(PNode root) {
+    static Set<PNode> getDirectDescendants(PNode root) {
         Set<PNode> all = new HashSet<PNode>();
         Set<PNode> nextLayer = new HashSet<PNode>();
         for (PChild child : root.getChildren()) {

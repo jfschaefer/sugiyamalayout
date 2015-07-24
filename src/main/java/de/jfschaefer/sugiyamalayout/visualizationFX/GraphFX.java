@@ -22,7 +22,7 @@ import java.awt.geom.Point2D;
 import java.util.*;
 
 public class GraphFX<V, E> extends Pane {
-    public GraphFX(Layout<V, E> layout, GraphFXNodeFactory<V> nodeFactory, Map<E, String> edgeLabels) {
+    public GraphFX(Layout<V, E> layout, GraphFXNodeFactory<V> nodeFactory, Map<E, String> edgeLabels, Color edgeColor, Color labelColor) {
         Configuration config = layout.getConfig();
         minWidth(layout.getWidth());
         maxWidth(layout.getWidth());
@@ -50,6 +50,7 @@ public class GraphFX<V, E> extends Pane {
                             arrowhead.setLayoutX(points.get(i+1).getX());
                             arrowhead.setLayoutY(points.get(i+1).getY());
                             arrowhead.getTransforms().add(new Rotate(365d / (2 * Math.PI) * angle + 90, 0, 0));
+                            arrowhead.setFill(edgeColor);
                             getChildren().add(arrowhead);
                         }
                     } else {
@@ -58,13 +59,14 @@ public class GraphFX<V, E> extends Pane {
                     CubicCurve segment = new CubicCurve(points.get(i).getX(), points.get(i).getY(), c0.getX(), c0.getY(),
                             c1.getX(), c1.getY(), points.get(i+1).getX(), points.get(i+1).getY());
                     segment.setFill(Color.TRANSPARENT);
-                    segment.setStroke(Color.BLACK);
+                    segment.setStroke(edgeColor);
                     getChildren().add(segment);
                 }
             } else {
                 for (int i = 0; i < points.size() - 1; i++) {
                     Line segment = new Line(points.get(i).getX(), points.get(i).getY(),
                             points.get(i+1).getX(), points.get(i+1).getY());
+                    segment.setFill(edgeColor);
                     if (i == points.size() - 2 && layout.getConfig().getDrawArrowHeads()) {
                         if (layout.getConfig().getDrawArrowHeads()) {
                             Polygon arrowhead = new Polygon(0d, 0d, 4d, 8d, -4d, 8d);
@@ -73,6 +75,7 @@ public class GraphFX<V, E> extends Pane {
                             arrowhead.setLayoutX(points.get(i+1).getX());
                             arrowhead.setLayoutY(points.get(i+1).getY());
                             arrowhead.getTransforms().add(new Rotate(365d / (2 * Math.PI) * angle + 90, 0, 0));
+                            arrowhead.setFill(edgeColor);
                             getChildren().add(arrowhead);
                         }
                     }
@@ -82,6 +85,7 @@ public class GraphFX<V, E> extends Pane {
             if (config.getDrawLabels()) {
                 Label label = new Label(edgeLabels.get(edge));
                 label.setStyle("-fx-font-size: 0.8em;");
+                label.setTextFill(labelColor);
                 final Label l2 = label;
                 label.boundsInLocalProperty().addListener(new ChangeListener<Bounds>() {
                     @Override
